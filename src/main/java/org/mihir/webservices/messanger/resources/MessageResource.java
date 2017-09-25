@@ -100,8 +100,39 @@ public class MessageResource {
 	@GET
 	@Path("/{messageId}")
 	// @Produces(MediaType.APPLICATION_JSON)
-	public Message getMessage(@PathParam("messageId") long messageId) {
-		return msgService.getMessage(messageId);
+	public Message getMessage(@PathParam("messageId") long messageId, @Context UriInfo uriInfo) {
+		Message message = msgService.getMessage(messageId);
+ 		message.addLink(getUriForSelf(uriInfo, message), "self");
+ 		message.addLink(getUriForProfile(uriInfo, message), "profile");
+ 		message.addLink(getUriForComments(uriInfo, message), "comments");
+		return message;
+	}
+
+	private String getUriForComments(UriInfo uriInfo, Message message) {
+		URI uri = uriInfo.getBaseUriBuilder()        //https://localhost:8080/messanger/webapi 
+				.path(MessageResource.class)	
+				.path(MessageResource.class, "getCommentResource")      //			/messages/mmessageId/comments
+				.path(MessageResource.class)
+				.resolveTemplate("messageId", message.getId())
+				.build();
+		return uri.toString();
+	}
+
+	private String getUriForProfile(UriInfo uriInfo, Message message) {
+		URI uri = uriInfo.getBaseUriBuilder()        //https://localhost:8080/messanger/webapi 
+				.path(ProfileResource.class)									//			/profiles
+				.path(message.getAuthor())							//					/{profileName}
+				.build();
+		return uri.toString();
+	}
+
+	private String getUriForSelf(UriInfo uriInfo, Message message) {
+		String url = uriInfo.getBaseUriBuilder()        //https://localhost:8080/messanger/webapi 
+		.path(MessageResource.class)									//			/messages
+		.path(Long.toString(message.getId()))							//					/{messageId}
+		.build()
+		.toString();
+		return url;
 	}
 
 	// calling sub resource
