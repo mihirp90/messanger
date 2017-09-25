@@ -5,6 +5,7 @@ import java.util.Calendar;
 import java.util.List;
 
 import org.mihir.webservices.messanger.database.DatabaseClass;
+import org.mihir.webservices.messanger.exception.DataNotFoundException;
 import org.mihir.webservices.messanger.model.Message;
 
 public class MessageService {
@@ -21,7 +22,12 @@ public class MessageService {
 		return new ArrayList<Message>(messages.values());
 	}
 	public Message getMessage(long id) {
-		return messages.get(id);
+		 Message message = messages.get(id);
+
+		 if(message == null) {
+			 throw new DataNotFoundException("message with id "+ id + " not found");
+		 }
+		 return message;
 	}
 	public Message addMessage(Message msg) {
 		msg.setId(messages.size() + 1);
