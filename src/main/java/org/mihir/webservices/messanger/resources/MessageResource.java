@@ -47,7 +47,9 @@ public class MessageResource {
 	 * msgService.getAllMessages(); }
 	 */
 	// Using BeanParam to take any kind of parameter.
-	public List<Message> getMessages(@BeanParam MessageFilterBean filter) {
+	@Produces(MediaType.APPLICATION_JSON)
+	public List<Message> getJsonMessages(@BeanParam MessageFilterBean filter) {
+		System.out.println("JSON called");
 		if (filter.getYear() > 0) {
 			return msgService.getAllMessagesForYear(filter.getYear());
 		}
@@ -56,7 +58,19 @@ public class MessageResource {
 		}
 		return msgService.getAllMessages();
 	}
-
+	
+	@GET
+	@Produces(MediaType.TEXT_XML)
+	public List<Message> getXmlMessages(@BeanParam MessageFilterBean filter) {
+		System.out.println("XML called");
+		if (filter.getYear() > 0) {
+			return msgService.getAllMessagesForYear(filter.getYear());
+		}
+		if (filter.getStart() >= 0 && filter.getSize() > 0) {
+			return msgService.getAllMessagesPaginated(filter.getStart(), filter.getSize());
+		}
+		return msgService.getAllMessages();
+	}
 	@POST
 	// @Consumes(MediaType.APPLICATION_JSON)
 	// @Produces(MediaType.APPLICATION_JSON)
